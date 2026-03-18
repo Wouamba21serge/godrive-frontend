@@ -1,400 +1,514 @@
+import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
-import axios from 'axios'
+import Navbar from '../components/Navbar'
 
-// Bertoua scenes — using beautiful African city imagery
 const SLIDES = [
-  {
-    url: 'https://images.unsplash.com/photo-1609183480405-f4d46b3ab354?w=1200&q=80',
-    label: 'Bertoua City Centre',
-    sub: 'Le cœur de notre ville'
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&q=80',
-    label: 'East Region Roads',
-    sub: 'Des routes qui nous connectent'
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1200&q=80',
-    label: 'Travel Across Cameroon',
-    sub: 'Voyagez en toute liberté'
-  },
-  {
-    url: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=1200&q=80',
-    label: 'Your Journey Starts Here',
-    sub: 'Votre trajet commence ici'
-  },
+  'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1600',
+  'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=1600',
+  'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=1600',
+  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600',
 ]
 
 const STATS = [
-  { value: 120, label: 'Vehicles Available', suffix: '+' },
-  { value: 850, label: 'Happy Riders', suffix: '+' },
-  { value: 24, label: 'Hour Service', suffix: '/7' },
-  { value: 98, label: 'Satisfaction Rate', suffix: '%' },
+  { value:120, suffix:'+', label:'Vehicles' },
+  { value:850, suffix:'+', label:'Riders' },
+  { value:24,  suffix:'/7', label:'Available' },
+  { value:98,  suffix:'%', label:'Satisfaction' },
 ]
 
 const FEATURES = [
-  { icon: '🚗', title: 'Wide Selection', desc: 'Cars, vans, trucks — every vehicle type for every need in Bertoua.' },
-  { icon: '💳', title: 'Mobile Money', desc: 'Pay instantly with MTN MoMo or Orange Money. No cash needed.' },
-  { icon: '📍', title: 'Live Tracking', desc: 'Track your driver in real time from pickup to drop-off.' },
-  { icon: '🤖', title: 'Smart AI Picks', desc: 'Our system learns your preferences and recommends the best vehicle for you.' },
-  { icon: '⭐', title: 'Verified Drivers', desc: 'Every driver is rated and reviewed by the Bertoua community.' },
-  { icon: '🔔', title: 'Instant Alerts', desc: 'Get notified the moment your vehicle is confirmed and on its way.' },
+  { icon:'🚗', title:'Wide Vehicle Range', desc:'Motos, taxis, 4x4, minibuses — all categories across Bertoua.', color:'#e84118' },
+  { icon:'📱', title:'Book in Seconds', desc:'Register, choose vehicle, confirm — done in under 2 minutes.', color:'#1a5cff' },
+  { icon:'💸', title:'Mobile Money', desc:'Pay with MTN MoMo or Orange Money — no bank card needed.', color:'#18b87a' },
+  { icon:'🗺️', title:'Live Bertoua Map', desc:'See available vehicles near you on an interactive map.', color:'#7c3aed' },
+  { icon:'🤖', title:'AI Recommendations', desc:'Smart suggestions based on your travel needs.', color:'#f5c518' },
+  { icon:'🔒', title:'Verified & Secure', desc:'All drivers verified. JWT-secured accounts.', color:'#e84118' },
 ]
 
-function useCounter(target, duration = 2000, start = false) {
-  const [count, setCount] = useState(0)
-  useEffect(() => {
-    if (!start) return
-    let startTime = null
-    const step = (timestamp) => {
-      if (!startTime) startTime = timestamp
-      const progress = Math.min((timestamp - startTime) / duration, 1)
-      setCount(Math.floor(progress * target))
-      if (progress < 1) requestAnimationFrame(step)
-    }
-    requestAnimationFrame(step)
-  }, [target, duration, start])
-  return count
-}
-
-function StatCard({ value, label, suffix, animate }) {
-  const count = useCounter(value, 1800, animate)
-  return (
-    <div style={{
-      background: 'rgba(255,255,255,0.05)',
-      border: '1px solid rgba(255,255,255,0.1)',
-      borderRadius: '16px',
-      padding: '24px 16px',
-      textAlign: 'center',
-      transition: 'transform 0.3s',
-    }}
-      onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
-      onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
-    >
-      <div style={{ fontSize: '42px', fontWeight: 900, color: '#e84118', lineHeight: 1 }}>
-        {animate ? count : 0}{suffix}
-      </div>
-      <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', marginTop: '6px' }}>{label}</div>
-    </div>
-  )
-}
-
 export default function HomePage() {
+  const navigate = useNavigate()
   const [slide, setSlide] = useState(0)
-  const [animating, setAnimating] = useState(false)
-  const [statsVisible, setStatsVisible] = useState(false)
-  const [activeFeature, setActiveFeature] = useState(null)
-  const [apiMsg, setApiMsg] = useState('Connecting...')
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [counters, setCounters] = useState([0,0,0,0])
   const statsRef = useRef(null)
+  const [statsStarted, setStatsStarted] = useState(false)
 
-  // Auto-rotate slides
   useEffect(() => {
-    const timer = setInterval(() => {
-      setAnimating(true)
-      setTimeout(() => {
-        setSlide(s => (s + 1) % SLIDES.length)
-        setAnimating(false)
-      }, 500)
-    }, 4000)
-    return () => clearInterval(timer)
+    const t = setInterval(() => setSlide(s => (s+1) % SLIDES.length), 4000)
+    return () => clearInterval(t)
   }, [])
 
-  // Intersection observer for stats counter
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setStatsVisible(true) },
-      { threshold: 0.3 }
-    )
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !statsStarted) {
+        setStatsStarted(true)
+        STATS.forEach((s,i) => {
+          let cur = 0
+          const step = Math.ceil(s.value/50)
+          const t = setInterval(() => {
+            cur = Math.min(cur+step, s.value)
+            setCounters(prev => { const n=[...prev]; n[i]=cur; return n })
+            if (cur >= s.value) clearInterval(t)
+          }, 30)
+        })
+      }
+    }, { threshold:0.3 })
     if (statsRef.current) observer.observe(statsRef.current)
     return () => observer.disconnect()
-  }, [])
-
-  // API ping
-  useEffect(() => {
-    axios.get('http://localhost:8080/api/hello')
-      .then(() => setApiMsg('✅ GoDrive System Online'))
-      .catch(() => setApiMsg('🟡 Starting up...'))
-  }, [])
-
-  const goToSlide = (i) => {
-    setAnimating(true)
-    setTimeout(() => { setSlide(i); setAnimating(false) }, 400)
-  }
+  }, [statsStarted])
 
   return (
-    <div style={{ background: '#0c0f18', minHeight: '100vh', fontFamily: 'DM Sans, sans-serif', color: '#fff', overflowX: 'hidden' }}>
+    <div style={{
+      minHeight:'100vh', background:'#0c0f18', color:'#fff',
+      fontFamily:"'DM Sans',system-ui,sans-serif", overflowX:'hidden',
+    }}>
+      <Navbar />
 
-      {/* ── NAVBAR ── */}
-      <nav style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        background: 'rgba(12,15,24,0.85)', backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-        padding: '0 40px', height: '64px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+      {/* ── HERO ── */}
+      <section style={{
+        position:'relative', height:'100vh', minHeight:'600px',
+        display:'flex', alignItems:'center', overflow:'hidden',
       }}>
-        <div style={{ fontSize: '26px', fontWeight: 900, letterSpacing: '-1px' }}>
-          Go<span style={{ color: '#e84118' }}>Drive</span>
-          <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginLeft: '8px', fontWeight: 400, letterSpacing: '2px' }}>BERTOUA</span>
-        </div>
-        <div style={{ display: 'flex', gap: '32px', fontSize: '14px', color: 'rgba(255,255,255,0.6)' }}>
-          {['Vehicles', 'How it Works', 'About', 'Contact'].map(item => (
-            <span key={item} style={{ cursor: 'pointer', transition: 'color 0.2s' }}
-              onMouseEnter={e => e.target.style.color = '#fff'}
-              onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.6)'}
-            >{item}</span>
-          ))}
-        </div>
-        <button style={{
-          background: '#e84118', color: '#fff', border: 'none',
-          padding: '10px 24px', borderRadius: '8px', fontWeight: 700,
-          fontSize: '14px', cursor: 'pointer'
-        }}>Book Now →</button>
-      </nav>
+        {/* Slideshow */}
+        {SLIDES.map((url,i) => (
+          <div key={i} style={{
+            position:'absolute', inset:0,
+            backgroundImage:`url(${url})`,
+            backgroundSize:'cover', backgroundPosition:'center',
+            opacity: slide===i ? 1 : 0,
+            transition:'opacity 1s ease',
+          }} />
+        ))}
 
-      {/* ── HERO WITH ROTATING SLIDESHOW ── */}
-      <div style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}>
-
-        {/* Background image */}
+        {/* Overlay */}
         <div style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: `url(${SLIDES[slide].url})`,
-          backgroundSize: 'cover', backgroundPosition: 'center',
-          opacity: animating ? 0 : 1,
-          transition: 'opacity 0.5s ease',
-          transform: animating ? 'scale(1.05)' : 'scale(1)',
+          position:'absolute', inset:0,
+          background:'linear-gradient(to right, rgba(12,15,24,0.97) 0%, rgba(12,15,24,0.65) 60%, rgba(12,15,24,0.25) 100%)',
         }} />
 
-        {/* Dark overlay */}
+        {/* Red left line */}
         <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(to right, rgba(12,15,24,0.92) 40%, rgba(12,15,24,0.4) 100%)'
+          position:'absolute', left:0, top:0, bottom:0, width:'4px',
+          background:'linear-gradient(to bottom, transparent, #e84118, transparent)',
         }} />
 
-        {/* Animated red accent line */}
+        {/* Content */}
         <div style={{
-          position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px',
-          background: 'linear-gradient(to bottom, transparent, #e84118, transparent)',
-          animation: 'pulse 2s infinite'
-        }} />
-
-        {/* Hero content */}
-        <div style={{
-          position: 'relative', zIndex: 2,
-          paddingTop: '64px', height: '100%',
-          display: 'flex', alignItems: 'center', paddingLeft: '80px'
+          position:'relative', zIndex:2,
+          padding:'0 clamp(24px,6vw,80px)',
+          maxWidth:'720px', marginTop:'64px',
         }}>
-          <div style={{ maxWidth: '600px' }}>
-            {/* Location badge */}
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: '8px',
-              background: 'rgba(232,65,24,0.15)', border: '1px solid rgba(232,65,24,0.3)',
-              borderRadius: '50px', padding: '6px 16px', marginBottom: '24px'
-            }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#e84118', display: 'inline-block', animation: 'blink 1.5s infinite' }} />
-              <span style={{ fontSize: '12px', color: '#e84118', fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-                📍 GoDrive in Bertoua
-              </span>
-            </div>
+          <div style={{
+            display:'inline-flex', alignItems:'center', gap:'8px',
+            background:'rgba(232,65,24,0.12)',
+            border:'1px solid rgba(232,65,24,0.25)',
+            borderRadius:'50px', padding:'6px 16px', marginBottom:'24px',
+          }}>
+            <span style={{ width:'6px', height:'6px', borderRadius:'50%', background:'#e84118', display:'inline-block' }} />
+            <span style={{ fontSize:'11px', color:'#e84118', fontWeight:'700', letterSpacing:'2px', textTransform:'uppercase' }}>
+              GoDrive — Bertoua, East Region
+            </span>
+          </div>
 
-            {/* Main heading */}
-            <h1 style={{ fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 900, lineHeight: 1.05, letterSpacing: '-2px', marginBottom: '20px' }}>
-              Move freely<br />
-              <span style={{ color: '#e84118' }}>across Bertoua</span><br />
-              with GoDrive.
-            </h1>
+          <h1 style={{
+            fontSize:'clamp(38px,7.5vw,76px)', fontWeight:'900',
+            lineHeight:1, letterSpacing:'-2.5px', marginBottom:'20px',
+          }}>
+            Move freely<br />
+            <span style={{ color:'#e84118' }}>across Bertoua</span><br />
+            with GoDrive.
+          </h1>
 
-            <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '17px', lineHeight: 1.7, marginBottom: '12px' }}>
-              The fastest way to book a trusted vehicle in Bertoua. From the market to Abong-Mbang — we get you there safely.
-            </p>
-            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '14px', fontStyle: 'italic', marginBottom: '36px' }}>
-              Réservez un véhicule de confiance à Bertoua en quelques secondes.
-            </p>
+          <p style={{
+            fontSize:'clamp(14px,2vw,17px)', color:'rgba(255,255,255,0.5)',
+            lineHeight:1.75, marginBottom:'8px', maxWidth:'500px',
+          }}>
+            The first digital vehicle booking platform built for Bertoua.
+            Book motos, taxis, 4x4s and trucks — in seconds.
+          </p>
+          <p style={{ fontSize:'13px', color:'rgba(255,255,255,0.2)', fontStyle:'italic', marginBottom:'36px' }}>
+            La première plateforme de réservation de véhicules à Bertoua.
+          </p>
 
-            {/* CTA buttons */}
-            <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', marginBottom: '48px' }}>
-              <button style={{
-                background: '#e84118', color: '#fff', border: 'none',
-                padding: '16px 36px', borderRadius: '12px', fontWeight: 800,
-                fontSize: '16px', cursor: 'pointer', transition: 'all 0.2s',
-                boxShadow: '0 8px 32px rgba(232,65,24,0.4)'
-              }}
-                onMouseEnter={e => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 12px 40px rgba(232,65,24,0.6)' }}
-                onMouseLeave={e => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 8px 32px rgba(232,65,24,0.4)' }}
-              >
-                🚗 Book a Vehicle
-              </button>
-              <button style={{
-                background: 'transparent', color: '#fff',
-                border: '2px solid rgba(255,255,255,0.2)',
-                padding: '16px 36px', borderRadius: '12px', fontWeight: 700,
-                fontSize: '16px', cursor: 'pointer', transition: 'all 0.2s'
-              }}
-                onMouseEnter={e => { e.target.style.background = 'rgba(255,255,255,0.05)'; e.target.style.borderColor = 'rgba(255,255,255,0.4)' }}
-                onMouseLeave={e => { e.target.style.background = 'transparent'; e.target.style.borderColor = 'rgba(255,255,255,0.2)' }}
-              >
-                List Your Vehicle →
-              </button>
-            </div>
-
-            {/* Slide label */}
-            <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', fontStyle: 'italic' }}>
-               {SLIDES[slide].label} — <span style={{ color: 'rgba(255,255,255,0.25)' }}>{SLIDES[slide].sub}</span>
-            </div>
+          <div style={{ display:'flex', gap:'12px', flexWrap:'wrap' }}>
+            <button onClick={() => navigate('/register')} style={{
+              background:'#e84118', border:'none', color:'#fff',
+              padding:'clamp(13px,2vw,17px) clamp(24px,3vw,40px)',
+              borderRadius:'12px', cursor:'pointer',
+              fontSize:'clamp(14px,2vw,17px)', fontWeight:'800',
+              minHeight:'54px',
+            }}>🚗 Book a Vehicle</button>
+            <button onClick={() => navigate('/vehicles')} style={{
+              background:'rgba(255,255,255,0.06)',
+              border:'1.5px solid rgba(255,255,255,0.15)',
+              color:'#fff',
+              padding:'clamp(13px,2vw,17px) clamp(24px,3vw,40px)',
+              borderRadius:'12px', cursor:'pointer',
+              fontSize:'clamp(14px,2vw,17px)', fontWeight:'600',
+              minHeight:'54px',
+            }}>View Vehicles →</button>
           </div>
         </div>
 
         {/* Slide dots */}
         <div style={{
-          position: 'absolute', bottom: '40px', left: '80px',
-          display: 'flex', gap: '10px', zIndex: 3
+          position:'absolute', bottom:'28px', left:'50%',
+          transform:'translateX(-50%)',
+          display:'flex', gap:'8px', zIndex:2,
         }}>
-          {SLIDES.map((_, i) => (
-            <button key={i} onClick={() => goToSlide(i)} style={{
-              width: i === slide ? '32px' : '8px', height: '8px',
-              borderRadius: '50px', border: 'none', cursor: 'pointer',
-              background: i === slide ? '#e84118' : 'rgba(255,255,255,0.3)',
-              transition: 'all 0.3s', padding: 0
+          {SLIDES.map((_,i) => (
+            <button key={i} onClick={() => setSlide(i)} style={{
+              width: slide===i ? '28px' : '8px', height:'8px',
+              borderRadius:'4px', padding:0, border:'none',
+              background: slide===i ? '#e84118' : 'rgba(255,255,255,0.25)',
+              cursor:'pointer', transition:'all 0.35s',
             }} />
           ))}
         </div>
+      </section>
 
-        {/* Scroll hint */}
-        <div style={{
-          position: 'absolute', bottom: '40px', right: '40px', zIndex: 3,
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
-          color: 'rgba(255,255,255,0.3)', fontSize: '11px', letterSpacing: '2px'
-        }}>
-          <span style={{ animation: 'bounce 2s infinite' }}>↓</span>
-          SCROLL
-        </div>
-      </div>
-
-      {/* ── STATS BAR ── */}
-      <div ref={statsRef} style={{
-        background: 'rgba(232,65,24,0.08)',
-        borderTop: '1px solid rgba(232,65,24,0.2)',
-        borderBottom: '1px solid rgba(232,65,24,0.2)',
-        padding: '48px 80px'
+      {/* ── STATS ── */}
+      <section ref={statsRef} style={{
+        background:'#e84118',
+        padding:'clamp(28px,4vw,44px) clamp(24px,6vw,80px)',
+        display:'grid',
+        gridTemplateColumns:'repeat(auto-fit,minmax(110px,1fr))',
+        gap:'20px', textAlign:'center',
       }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '24px', maxWidth: '900px', margin: '0 auto' }}>
-          {STATS.map((s) => (
-            <StatCard key={s.label} {...s} animate={statsVisible} />
-          ))}
-        </div>
-      </div>
-
-      {/* ── HOW IT WORKS ── */}
-      <div style={{ padding: '100px 80px', textAlign: 'center' }}>
-        <p style={{ color: '#e84118', fontWeight: 700, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '12px' }}>Simple & Fast</p>
-        <h2 style={{ fontSize: '42px', fontWeight: 900, letterSpacing: '-1.5px', marginBottom: '60px' }}>
-          Book in <span style={{ color: '#e84118' }}>3 steps</span>
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0', maxWidth: '800px', margin: '0 auto', position: 'relative' }}>
-          {/* Connecting line */}
-          <div style={{ position: 'absolute', top: '36px', left: '20%', right: '20%', height: '2px', background: 'rgba(232,65,24,0.3)', zIndex: 0 }} />
-          {[
-            { num: '01', icon: '🔍', title: 'Choose Your Vehicle', desc: 'Browse our catalogue. Filter by type, location, and price.' },
-            { num: '02', icon: '📅', title: 'Pick Date & Location', desc: 'Set your pickup point and schedule anywhere in Bertoua.' },
-            { num: '03', icon: '✅', title: 'Confirm & Pay', desc: 'Pay with Mobile Money. Get instant confirmation.' },
-          ].map((step) => (
-            <div key={step.num} style={{ position: 'relative', zIndex: 1, padding: '0 20px' }}>
-              <div style={{
-                width: '72px', height: '72px', borderRadius: '50%',
-                background: '#e84118', margin: '0 auto 20px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '28px', boxShadow: '0 8px 32px rgba(232,65,24,0.4)'
-              }}>{step.icon}</div>
-              <div style={{ color: 'rgba(232,65,24,0.4)', fontSize: '11px', fontWeight: 700, letterSpacing: '2px', marginBottom: '8px' }}>{step.num}</div>
-              <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '8px' }}>{step.title}</h3>
-              <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '13.5px', lineHeight: 1.6 }}>{step.desc}</p>
+        {STATS.map((s,i) => (
+          <div key={i}>
+            <div style={{ fontSize:'clamp(30px,5vw,48px)', fontWeight:'900', letterSpacing:'-1px', lineHeight:1 }}>
+              {counters[i]}{s.suffix}
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── FEATURES GRID ── */}
-      <div style={{ padding: '0 80px 100px' }}>
-        <p style={{ color: '#e84118', fontWeight: 700, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '12px', textAlign: 'center' }}>Everything You Need</p>
-        <h2 style={{ fontSize: '42px', fontWeight: 900, letterSpacing: '-1.5px', marginBottom: '48px', textAlign: 'center' }}>
-          Built for <span style={{ color: '#e84118' }}>Bertoua</span>
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '16px', maxWidth: '960px', margin: '0 auto' }}>
-          {FEATURES.map((f, i) => (
-            <div key={i}
-              onMouseEnter={() => setActiveFeature(i)}
-              onMouseLeave={() => setActiveFeature(null)}
-              style={{
-                background: activeFeature === i ? 'rgba(232,65,24,0.08)' : 'rgba(255,255,255,0.03)',
-                border: `1.5px solid ${activeFeature === i ? 'rgba(232,65,24,0.4)' : 'rgba(255,255,255,0.07)'}`,
-                borderRadius: '16px', padding: '28px 24px',
-                cursor: 'default', transition: 'all 0.25s',
-                transform: activeFeature === i ? 'translateY(-4px)' : 'none'
-              }}>
-              <div style={{ fontSize: '32px', marginBottom: '14px' }}>{f.icon}</div>
-              <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '8px' }}>{f.title}</h3>
-              <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '13px', lineHeight: 1.65 }}>{f.desc}</p>
+            <div style={{ fontSize:'12px', opacity:0.75, marginTop:'6px', fontWeight:'600', letterSpacing:'1px', textTransform:'uppercase' }}>
+              {s.label}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        ))}
+      </section>
 
-      {/* ── CTA BANNER ── */}
-      <div style={{
-        margin: '0 80px 100px',
-        background: 'linear-gradient(135deg, #e84118 0%, #c0320f 100%)',
-        borderRadius: '24px', padding: '64px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        flexWrap: 'wrap', gap: '32px',
-        boxShadow: '0 32px 80px rgba(232,65,24,0.3)'
+      {/* ── ABOUT PREVIEW ── */}
+      <section style={{
+        padding:'clamp(56px,8vw,100px) clamp(24px,6vw,80px)',
+        background:'#0c0f18',
+        display:'grid',
+        gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',
+        gap:'clamp(32px,5vw,80px)',
+        alignItems:'center',
+        maxWidth:'1200px', margin:'0 auto',
       }}>
         <div>
-          <h2 style={{ fontSize: '36px', fontWeight: 900, letterSpacing: '-1px', marginBottom: '10px' }}>
-            Ready to move smarter<br />in Bertoua?
-          </h2>
-          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '16px' }}>
-            Join hundreds of Bertoua residents already using GoDrive.
+          <p style={{ color:'#e84118', fontSize:'11px', fontWeight:'700', letterSpacing:'3px', textTransform:'uppercase', marginBottom:'14px' }}>
+            About GoDrive
           </p>
+          <h2 style={{ fontSize:'clamp(28px,5vw,48px)', fontWeight:'900', letterSpacing:'-1.5px', lineHeight:1.1, marginBottom:'20px' }}>
+            Bertoua's First<br /><span style={{ color:'#e84118' }}>Smart Mobility</span><br />Platform
+          </h2>
+          <p style={{ fontSize:'clamp(14px,1.6vw,16px)', color:'rgba(255,255,255,0.5)', lineHeight:1.85, marginBottom:'16px' }}>
+            Before GoDrive, residents of Bertoua had no digital way to book a trusted vehicle.
+            All transport was informal — negotiated verbally, paid in cash, with no verification.
+          </p>
+          <p style={{ fontSize:'clamp(14px,1.6vw,16px)', color:'rgba(255,255,255,0.5)', lineHeight:1.85, marginBottom:'28px' }}>
+            GoDrive is the first platform built specifically for Bertoua — with Mobile Money payments,
+            local vehicle types, bilingual interface, and AI-powered recommendations.
+          </p>
+          <button onClick={() => navigate('/about')} style={{
+            background:'transparent',
+            border:'1.5px solid rgba(232,65,24,0.4)',
+            color:'#e84118', padding:'12px 28px',
+            borderRadius:'10px', cursor:'pointer',
+            fontSize:'14px', fontWeight:'700',
+          }}>Learn More About GoDrive →</button>
         </div>
-        <div style={{ display: 'flex', gap: '14px' }}>
-          <button style={{
-            background: '#fff', color: '#e84118', border: 'none',
-            padding: '16px 36px', borderRadius: '12px', fontWeight: 800,
-            fontSize: '16px', cursor: 'pointer'
-          }}>Get Started Free</button>
-          <button style={{
-            background: 'rgba(0,0,0,0.2)', color: '#fff', border: '2px solid rgba(255,255,255,0.3)',
-            padding: '16px 36px', borderRadius: '12px', fontWeight: 700,
-            fontSize: '16px', cursor: 'pointer'
+
+        {/* Feature mini-grid */}
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px' }}>
+          {[
+            { icon:'📱', title:'PWA App', desc:'Works on any phone without app store' },
+            { icon:'💸', title:'Mobile Money', desc:'MTN MoMo & Orange Money' },
+            { icon:'🗺️', title:'Bertoua Map', desc:'Live vehicle location map' },
+            { icon:'🤖', title:'AI Engine', desc:'Smart vehicle recommendations' },
+          ].map((c,i) => (
+            <div key={i} style={{
+              background:'rgba(255,255,255,0.03)',
+              border:'1px solid rgba(255,255,255,0.07)',
+              borderRadius:'14px', padding:'clamp(16px,2vw,22px)',
+            }}>
+              <div style={{ fontSize:'28px', marginBottom:'10px' }}>{c.icon}</div>
+              <div style={{ fontSize:'13px', fontWeight:'800', marginBottom:'4px' }}>{c.title}</div>
+              <div style={{ fontSize:'11px', color:'rgba(255,255,255,0.35)', lineHeight:1.55 }}>{c.desc}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── FEATURES ── */}
+      <section style={{
+        padding:'clamp(56px,8vw,100px) clamp(24px,6vw,80px)',
+        background:'rgba(255,255,255,0.015)',
+      }}>
+        <div style={{ textAlign:'center', marginBottom:'clamp(36px,5vw,60px)' }}>
+          <p style={{ color:'#1a5cff', fontSize:'11px', fontWeight:'700', letterSpacing:'3px', textTransform:'uppercase', marginBottom:'12px' }}>
+            Why GoDrive
+          </p>
+          <h2 style={{ fontSize:'clamp(28px,5vw,48px)', fontWeight:'900', letterSpacing:'-1.5px', lineHeight:1.1 }}>
+            Built for <span style={{ color:'#1a5cff' }}>Bertoua</span>
+          </h2>
+        </div>
+
+        <div style={{
+          display:'grid',
+          gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',
+          gap:'14px', maxWidth:'1100px', margin:'0 auto',
+        }}>
+          {FEATURES.map((f,i) => (
+            <div key={i} style={{
+              background:'rgba(255,255,255,0.03)',
+              border:'1px solid rgba(255,255,255,0.07)',
+              borderRadius:'16px', padding:'clamp(20px,3vw,28px)',
+            }}>
+              <div style={{ fontSize:'32px', marginBottom:'14px' }}>{f.icon}</div>
+              <h3 style={{ fontSize:'16px', fontWeight:'800', marginBottom:'8px', color:f.color }}>{f.title}</h3>
+              <p style={{ fontSize:'13.5px', color:'rgba(255,255,255,0.45)', lineHeight:1.65, margin:0 }}>{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── VEHICLE PREVIEW ── */}
+      <section style={{
+        padding:'clamp(56px,8vw,100px) clamp(24px,6vw,80px)',
+        background:'#0c0f18', textAlign:'center',
+      }}>
+        <p style={{ color:'#18b87a', fontSize:'11px', fontWeight:'700', letterSpacing:'3px', textTransform:'uppercase', marginBottom:'12px' }}>
+          Our Fleet
+        </p>
+        <h2 style={{ fontSize:'clamp(28px,5vw,48px)', fontWeight:'900', letterSpacing:'-1.5px', marginBottom:'16px' }}>
+          Every Vehicle <span style={{ color:'#18b87a' }}>You Need</span>
+        </h2>
+        <p style={{ color:'rgba(255,255,255,0.4)', fontSize:'15px', marginBottom:'36px', maxWidth:'540px', margin:'0 auto 36px' }}>
+          From daily motos to cargo trucks — browse our full fleet and book instantly.
+        </p>
+
+        {/* Vehicle preview cards */}
+        <div style={{
+          display:'grid',
+          gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',
+          gap:'12px', maxWidth:'1000px', margin:'0 auto 36px',
+        }}>
+          {[
+            { img:'/vehicles/moto.jpg',    icon:'🏍️', name:'Moto Taxi',    price:'2,500',  color:'#e84118' },
+            { img:'/vehicles/corolla.jpg', icon:'🚗', name:'Sedan Taxi',   price:'8,000',  color:'#18b87a' },
+            { img:'/vehicles/hilux.jpg',   icon:'🚙', name:'4x4 SUV',      price:'15,000', color:'#7c3aed' },
+            { img:'/vehicles/hiace.jpg',   icon:'🚐', name:'Minibus',      price:'20,000', color:'#f5c518' },
+          ].map((v,i) => (
+            <div key={i} onClick={() => navigate('/vehicles')} style={{
+              background:'rgba(255,255,255,0.03)',
+              border:'1px solid rgba(255,255,255,0.08)',
+              borderRadius:'14px', overflow:'hidden',
+              cursor:'pointer', transition:'all 0.2s',
+            }}
+              onMouseEnter={e => e.currentTarget.style.transform='translateY(-4px)'}
+              onMouseLeave={e => e.currentTarget.style.transform='none'}
+            >
+              <div style={{ height:'130px', background:'rgba(255,255,255,0.04)', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <img src={v.img} alt={v.name}
+                  style={{ width:'100%', height:'100%', objectFit:'cover' }}
+                  onError={e => { e.target.style.display='none'; e.target.parentNode.innerHTML=`<span style="font-size:52px">${v.icon}</span>` }}
+                />
+              </div>
+              <div style={{ padding:'14px' }}>
+                <div style={{ fontSize:'13px', fontWeight:'800', marginBottom:'4px' }}>{v.name}</div>
+                <div style={{ fontSize:'12px', color:v.color, fontWeight:'700' }}>{v.price} FCFA/day</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button onClick={() => navigate('/vehicles')} style={{
+          background:'#18b87a', border:'none', color:'#fff',
+          padding:'clamp(13px,2vw,17px) clamp(28px,4vw,52px)',
+          borderRadius:'12px', cursor:'pointer',
+          fontSize:'clamp(14px,2vw,16px)', fontWeight:'800', minHeight:'54px',
+        }}>View All Vehicles →</button>
+      </section>
+
+      {/* ── HOW IT WORKS ── */}
+      <section style={{
+        padding:'clamp(56px,8vw,100px) clamp(24px,6vw,80px)',
+        background:'rgba(255,255,255,0.015)',
+      }}>
+        <div style={{ textAlign:'center', marginBottom:'clamp(36px,5vw,60px)' }}>
+          <p style={{ color:'#7c3aed', fontSize:'11px', fontWeight:'700', letterSpacing:'3px', textTransform:'uppercase', marginBottom:'12px' }}>Simple Process</p>
+          <h2 style={{ fontSize:'clamp(28px,5vw,48px)', fontWeight:'900', letterSpacing:'-1.5px' }}>
+            Book in <span style={{ color:'#7c3aed' }}>3 Steps</span>
+          </h2>
+        </div>
+
+        <div style={{
+          display:'grid',
+          gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',
+          gap:'16px', maxWidth:'900px', margin:'0 auto',
+        }}>
+          {[
+            { step:'01', icon:'📝', title:'Register', desc:'Create your GoDrive account in 60 seconds. Choose your role.', color:'#e84118' },
+            { step:'02', icon:'🔍', title:'Choose Vehicle', desc:'Browse the catalogue, view on map, compare prices.', color:'#1a5cff' },
+            { step:'03', icon:'✅', title:'Book & Pay', desc:'Confirm your booking and pay with MTN MoMo or Orange Money.', color:'#18b87a' },
+          ].map((s,i) => (
+            <div key={i} style={{
+              background:'rgba(255,255,255,0.03)',
+              border:`1.5px solid ${s.color}25`,
+              borderRadius:'16px', padding:'clamp(24px,3vw,32px)',
+              position:'relative', overflow:'hidden',
+            }}>
+              <div style={{
+                position:'absolute', top:'12px', right:'16px',
+                fontSize:'clamp(50px,7vw,70px)', fontWeight:'900',
+                color:`${s.color}10`, lineHeight:1, fontFamily:'monospace',
+              }}>{s.step}</div>
+              <div style={{ fontSize:'36px', marginBottom:'16px' }}>{s.icon}</div>
+              <h3 style={{ fontSize:'18px', fontWeight:'800', color:s.color, marginBottom:'8px' }}>{s.title}</h3>
+              <p style={{ fontSize:'13.5px', color:'rgba(255,255,255,0.45)', lineHeight:1.65, margin:0 }}>{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── CTA BANNER ── */}
+      <section style={{
+        padding:'clamp(48px,6vw,80px) clamp(24px,6vw,80px)',
+        background:'#e84118', textAlign:'center',
+      }}>
+        <h2 style={{ fontSize:'clamp(28px,5vw,52px)', fontWeight:'900', letterSpacing:'-1.5px', marginBottom:'16px', lineHeight:1.05 }}>
+          Ready to Move<br />with GoDrive?
+        </h2>
+        <p style={{ fontSize:'clamp(14px,2vw,17px)', opacity:0.8, marginBottom:'32px', maxWidth:'480px', margin:'0 auto 32px' }}>
+          Join Bertoua's first digital transport platform. Register free today.
+        </p>
+        <div style={{ display:'flex', gap:'12px', justifyContent:'center', flexWrap:'wrap' }}>
+          <button onClick={() => navigate('/register')} style={{
+            background:'#fff', border:'none', color:'#e84118',
+            padding:'clamp(13px,2vw,17px) clamp(28px,4vw,52px)',
+            borderRadius:'12px', cursor:'pointer',
+            fontSize:'clamp(14px,2vw,17px)', fontWeight:'900', minHeight:'54px',
+          }}>Get Started Free →</button>
+          <button onClick={() => navigate('/about')} style={{
+            background:'transparent',
+            border:'2px solid rgba(255,255,255,0.4)',
+            color:'#fff',
+            padding:'clamp(13px,2vw,17px) clamp(28px,4vw,52px)',
+            borderRadius:'12px', cursor:'pointer',
+            fontSize:'clamp(14px,2vw,17px)', fontWeight:'700', minHeight:'54px',
           }}>Learn More</button>
         </div>
-      </div>
+      </section>
 
       {/* ── FOOTER ── */}
       <footer style={{
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-        padding: '40px 80px',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        flexWrap: 'wrap', gap: '16px'
+        background:'#070a12',
+        borderTop:'1px solid rgba(255,255,255,0.05)',
+        padding:'clamp(40px,6vw,64px) clamp(24px,6vw,80px) 0',
+        fontFamily:"'DM Sans',system-ui,sans-serif",
       }}>
-        <div>
-          <div style={{ fontSize: '22px', fontWeight: 900 }}>Go<span style={{ color: '#e84118' }}>Drive</span></div>
-          <div style={{ color: 'rgba(255,255,255,0.25)', fontSize: '12px', marginTop: '4px' }}>Proudly built for Bertoua © 2025</div>
+        <div style={{
+          display:'grid',
+          gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',
+          gap:'clamp(28px,4vw,52px)',
+          marginBottom:'clamp(32px,4vw,52px)',
+        }}>
+          {/* Brand */}
+          <div>
+            <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'14px' }}>
+              <div style={{ width:'32px', height:'32px', background:'#e84118', borderRadius:'7px', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'16px' }}>🚗</div>
+              <span style={{ fontSize:'20px', fontWeight:'900', color:'#fff' }}>Go<span style={{ color:'#e84118' }}>Drive</span></span>
+            </div>
+            <p style={{ fontSize:'13px', color:'rgba(255,255,255,0.3)', lineHeight:1.75, maxWidth:'220px', marginBottom:'12px' }}>
+              Bertoua's first digital vehicle booking platform. Fast, secure, local.
+            </p>
+            <p style={{ fontSize:'11px', color:'rgba(255,255,255,0.15)', fontStyle:'italic' }}>
+              Réservez en quelques secondes.
+            </p>
+          </div>
+
+          {/* Platform */}
+          <div>
+            <h4 style={{ fontSize:'11px', fontWeight:'700', color:'rgba(255,255,255,0.4)', letterSpacing:'2px', textTransform:'uppercase', marginBottom:'18px' }}>Platform</h4>
+            {[
+              { label:'About GoDrive', path:'/about' },
+              { label:'Vehicle Models', path:'/vehicles' },
+              { label:'Our Team', path:'/team' },
+              { label:'Contact', path:'/contact' },
+            ].map((l,i) => (
+              <div key={i} onClick={() => navigate(l.path)} style={{
+                color:'rgba(255,255,255,0.35)', cursor:'pointer',
+                fontSize:'13.5px', marginBottom:'10px', transition:'color 0.2s',
+              }}
+                onMouseEnter={e => e.target.style.color='#e84118'}
+                onMouseLeave={e => e.target.style.color='rgba(255,255,255,0.35)'}>
+                {l.label}
+              </div>
+            ))}
+          </div>
+
+          {/* Account */}
+          <div>
+            <h4 style={{ fontSize:'11px', fontWeight:'700', color:'rgba(255,255,255,0.4)', letterSpacing:'2px', textTransform:'uppercase', marginBottom:'18px' }}>Account</h4>
+            {[
+              { label:'Register as Customer', path:'/register' },
+              { label:'Register as Driver', path:'/register' },
+              { label:'List Your Vehicle', path:'/register' },
+              { label:'Login', path:'/login' },
+            ].map((l,i) => (
+              <div key={i} onClick={() => navigate(l.path)} style={{
+                color:'rgba(255,255,255,0.35)', cursor:'pointer',
+                fontSize:'13.5px', marginBottom:'10px', transition:'color 0.2s',
+              }}
+                onMouseEnter={e => e.target.style.color='#e84118'}
+                onMouseLeave={e => e.target.style.color='rgba(255,255,255,0.35)'}>
+                {l.label}
+              </div>
+            ))}
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h4 style={{ fontSize:'11px', fontWeight:'700', color:'rgba(255,255,255,0.4)', letterSpacing:'2px', textTransform:'uppercase', marginBottom:'18px' }}>Contact</h4>
+            {[
+              { icon:'📍', text:'Bertoua, East Region' },
+              { icon:'📞', text:'+237 6XX XXX XXX' },
+              { icon:'📧', text:'contact@godrive.cm' },
+              { icon:'⏰', text:'Available 24/7' },
+            ].map((c,i) => (
+              <div key={i} style={{ display:'flex', gap:'8px', alignItems:'center', color:'rgba(255,255,255,0.35)', fontSize:'13px', marginBottom:'10px' }}>
+                <span>{c.icon}</span>{c.text}
+              </div>
+            ))}
+          </div>
         </div>
-        <div style={{ fontFamily: 'monospace', fontSize: '11px', color: 'rgba(255,255,255,0.2)' }}>
-          {apiMsg}
+
+        {/* Bottom bar */}
+        <div style={{
+          borderTop:'1px solid rgba(255,255,255,0.05)',
+          padding:'clamp(16px,3vw,24px) 0',
+          display:'flex', justifyContent:'space-between',
+          alignItems:'center', flexWrap:'wrap', gap:'12px',
+        }}>
+          <span style={{ fontSize:'12px', color:'rgba(255,255,255,0.2)' }}>
+            © 2026 GoDrive · Built by Dibot Wouamba Serge Cabrel · QuamTech, Yaoundé
+          </span>
+          <div style={{ display:'flex', gap:'16px' }}>
+            {['⚛️ React','🍃 Spring Boot','🗄️ MySQL','🤖 Python AI'].map((t,i) => (
+              <span key={i} style={{ fontSize:'11px', color:'rgba(255,255,255,0.15)' }}>{t}</span>
+            ))}
+          </div>
         </div>
       </footer>
 
-      {/* ── CSS ANIMATIONS ── */}
       <style>{`
-        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
-        @keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
-        * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0c0f18; }
-        ::-webkit-scrollbar-thumb { background: #e84118; border-radius: 3px; }
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,900&display=swap');
+        * { box-sizing:border-box; margin:0; padding:0; }
+        ::-webkit-scrollbar { width:5px; }
+        ::-webkit-scrollbar-track { background:#0c0f18; }
+        ::-webkit-scrollbar-thumb { background:#e84118; border-radius:3px; }
       `}</style>
     </div>
   )
