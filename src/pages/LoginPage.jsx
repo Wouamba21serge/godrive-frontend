@@ -94,7 +94,7 @@ export default function LoginPage() {
             color: 'rgba(255,255,255,0.35)',
             fontSize: isMobile ? '13px' : '14px',
             margin: 0
-          }}>Welcome back to Bertoua</p>
+          }}>Welcome back to GoDrive</p>
         </div>
 
         {/* Error */}

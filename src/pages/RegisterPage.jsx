@@ -55,8 +55,8 @@ export default function RegisterPage() {
   }
 
   const roles = [
-    { value: 'CUSTOMER', label: '🚗 Book a Vehicle', desc: 'I want to rent' },
-    { value: 'DRIVER',   label: '🧑‍✈️ Be a Driver',    desc: 'I want to drive' },
+    { value: 'CUSTOMER', label: '🧑 Book a Vehicle', desc: 'I want to rent' },
+    { value: 'DRIVER',   label: '🚗 Be a Driver',    desc: 'I want to drive' },
     { value: 'LESSOR',   label: '🏠 List My Car',     desc: 'I own vehicles' },
   ]
 
@@ -148,7 +148,7 @@ export default function RegisterPage() {
 
         {/* Role selector */}
         <div style={{ marginBottom: '28px' }}>
-          <label style={labelStyle}>I want to...</label>
+          <label style={labelStyle}>I want to be...</label>
           <div style={{
             display: 'grid',
             gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr',
@@ -175,7 +175,7 @@ export default function RegisterPage() {
                 }}
               >
                 <span style={{ fontSize: isMobile ? '20px' : '22px' }}>
-                  {r.value === 'CUSTOMER' ? '🚗' : r.value === 'DRIVER' ? '🧑‍✈️' : '🏠'}
+                  {r.value === 'CUSTOMER' ? '🧑' : r.value === 'DRIVER' ? '🚗' : '🏠'}
                 </span>
                 <div>
                   <div style={{ fontSize: '12px', fontWeight: '700' }}>

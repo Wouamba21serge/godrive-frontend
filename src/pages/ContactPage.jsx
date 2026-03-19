@@ -117,10 +117,9 @@ export default function ContactPage() {
               <h3 style={{ fontSize:'18px', fontWeight:'800', marginBottom:'20px' }}>Contact Information</h3>
               {[
                 { icon:'📍', label:'Address', value:'Bertoua, East Region, Cameroon' },
-                { icon:'📞', label:'Phone', value:'+237 694997608' },
-                { icon:'📧', label:'Email', value:'wouambaserge21@' },
+                { icon:'📞', label:'Phone', value:'+237 694 99 76 08' },
+                { icon:'📧', label:'Email', value:'wouambaserge21@gmail.com' },
                 { icon:'⏰', label:'Hours', value:'24/7 — Always available' },
-                { icon:'🚀', label:'Platform', value:'godrive.cm (launching soon)' },
               ].map((c,i) => (
                 <div key={i} style={{
                   display:'flex', gap:'14px', alignItems:'flex-start',

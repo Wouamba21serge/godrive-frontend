@@ -3,21 +3,21 @@ import { useState } from 'react'
 import Navbar from '../components/Navbar'
 
 const VEHICLES = [
-  { img:'/vehicles/moto.jpg',     name:'Honda CG 125',   type:'Moto Taxi',         price:'2,500',  seats:1,  tag:'Most Popular', color:'#e84118',
-    desc:'The most common transport in Bertoua. Fast, affordable, ideal for short trips through the city centre and local neighbourhoods.' },
-  { img:'/vehicles/tricycle.jpg', name:'Bajaj RE Tricycle', type:'Tricycle / Clando', price:'3,500',  seats:3,  tag:'City Travel',  color:'#1a5cff',
-    desc:'Three-wheeled motorised vehicle perfect for short urban distances. Can carry up to 3 passengers comfortably with luggage.' },
-  { img:'/vehicles/corolla.jpg',  name:'Toyota Corolla', type:'Sedan Taxi',         price:'8,000',  seats:4,  tag:'Comfortable',  color:'#18b87a',
-    desc:'Reliable and comfortable sedan ideal for longer journeys. Air-conditioned, safe, and suitable for business or family travel.' },
-  { img:'/vehicles/hilux.jpg',    name:'Toyota HiLux',   type:'4x4 SUV',            price:'15,000', seats:5,  tag:'Off-Road',     color:'#7c3aed',
-    desc:'Built for Cameroon\'s terrain. Perfect for travel outside Bertoua to rural areas, forest roads, and inter-city routes.' },
-  { img:'/vehicles/hiace.jpg',    name:'Toyota HiAce',   type:'Minibus',            price:'20,000', seats:14, tag:'Group Travel', color:'#f5c518',
-    desc:'Ideal for group travel, events, and corporate transfers. Spacious, comfortable, and available with a professional driver.' },
-  { img:'/vehicles/truck.jpg',    name:'Isuzu NQR',      type:'Cargo Truck',        price:'35,000', seats:2,  tag:'Freight',      color:'#e84118',
-    desc:'Heavy-duty cargo truck for transporting goods across the East Region. Available with driver and suitable for commercial freight.' },
+  { img:'/vehicles/car5.jpg',     name:'Suzuki Swift 2024 ',   type:'Taxi',         price:'2,500',  seats:2,  tag:'Most Popular', color:'#e84118',
+    desc:'Modern hatchback with sporty features.' },
+  { img:'/vehicles/car7.jpg', name:'Suzuki Mehran 2024 - ', type:'Clando', price:'3,500',  seats:3,  tag:'City Travel',  color:'#1a5cff',
+    desc:'Simple and economical car and comfortably with luggage.' },
+  { img:'/vehicles/Civic.jpg',  name:'Honda Civic 2024', type:'Civic Taxi',         price:'8,000',  seats:4,  tag:'Comfortable',  color:'#18b87a',
+    desc:'Reliable and comfortable for longer journeys. Air-conditioned, safe, and suitable for business.' },
+  { img:'/vehicles/car8.jpg',    name:'Toyota Fortuner 2024',   type:'4x4 SUV',            price:'15,000', seats:5,  tag:'Off-Road',     color:'#7c3aed',
+    desc:'Robust SUV for all terrains.. Perfect for travel outside Bertoua to rural areas, forest roads, and inter-city routes.' },
+  { img:'/vehicles/Honda.jpg',    name:'Honda City 2024',   type:'Honda',            price:'20,000', seats:4, tag:'Group Travel', color:'#f5c518',
+    desc:'Ideal for group travel, events, and corporate transfers.Compact and stylish with great fuel economy.' },
+  { img:'/vehicles/car4.jpg',    name:'Suzuki Cultus 2024',      type:'Cultus',        price:'35,000', seats:4,  tag:'Freight',      color:'#e84118',
+    desc:'Efficient and practical city car, suitable for commercial freight.' },
 ]
 
-const FILTERS = ['All', 'Moto Taxi', 'Tricycle / Clando', 'Sedan Taxi', '4x4 SUV', 'Minibus', 'Cargo Truck']
+const FILTERS = ['All', 'Taxi', 'Clando', 'Civic Taxi', '4x4 SUV', 'Honda', 'Cultus']
 
 export default function VehiclesPage() {
   const navigate = useNavigate()
@@ -39,7 +39,7 @@ export default function VehiclesPage() {
           Every Vehicle<br /><span style={{ color:'#1a5cff' }}>Bertoua Needs</span>
         </h1>
         <p style={{ fontSize:'clamp(14px,2vw,17px)', color:'rgba(255,255,255,0.45)', lineHeight:1.75, maxWidth:'580px', margin:'0 auto 32px' }}>
-          From daily motos to cargo trucks — browse our full fleet and book instantly with Mobile Money.
+          Browse our full fleet and book instantly with Mobile Money.
         </p>
 
         {/* Filter tabs */}

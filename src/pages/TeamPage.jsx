@@ -47,11 +47,9 @@ export default function TeamPage() {
               display:'flex', alignItems:'center', justifyContent:'center',
               fontSize:'52px',
             }}>
-              {/* 
-                REPLACE with your photo:
+              {
                 <img src="/team/serge.jpg" style={{width:'100%',height:'100%',objectFit:'cover'}} />
-              */}
-              👨‍💻
+              }
             </div>
 
             <div style={{
@@ -68,16 +66,16 @@ export default function TeamPage() {
             </h2>
             <p style={{ color:'rgba(255,255,255,0.4)', fontSize:'13px', marginBottom:'20px', lineHeight:1.6 }}>
               HND Software Engineering Student<br />
-              ZTF University Institute (HIACOMST)<br />
+              ZTF University Institute (ZTF-UI)<br />
               Internship at QuamTech, Yaoundé
             </p>
             <p style={{ fontSize:'14px', color:'rgba(255,255,255,0.5)', lineHeight:1.75, marginBottom:'24px' }}>
               Full-stack developer of GoDrive. Responsible for system architecture,
               React frontend, Spring Boot backend API, MySQL database design,
-              Python AI service, and all deployment infrastructure.
+              and all deployment infrastructure.
             </p>
             <div style={{ display:'flex', gap:'8px', justifyContent:'center', flexWrap:'wrap' }}>
-              {['React', 'Spring Boot', 'MySQL', 'Python', 'JWT'].map(t => (
+              {['React', 'Spring Boot', 'MySQL', 'JWT'].map(t => (
                 <span key={t} style={{
                   background:'rgba(232,65,24,0.08)',
                   border:'1px solid rgba(232,65,24,0.2)',
@@ -106,11 +104,10 @@ export default function TeamPage() {
               display:'flex', alignItems:'center', justifyContent:'center',
               fontSize:'52px',
             }}>
-              {/* 
-                REPLACE with supervisor photo:
-                <img src="/team/supervisor.jpg" style={{width:'100%',height:'100%',objectFit:'cover'}} />
-              */}
-              👨‍🏫
+              {
+                <img src="/team/supervisor.png" style={{width:'100%',height:'100%',objectFit:'cover'}} />
+              }
+            
             </div>
 
             <div style={{
@@ -120,15 +117,14 @@ export default function TeamPage() {
               color:'#1a5cff', padding:'3px 14px',
               borderRadius:'50px', fontSize:'10px', fontWeight:'700',
               letterSpacing:'1.5px', textTransform:'uppercase', marginBottom:'14px',
-            }}>Academic Supervisor</div>
+            }}>Supervisor</div>
 
             <h2 style={{ fontSize:'clamp(20px,3vw,26px)', fontWeight:'900', letterSpacing:'-0.5px', marginBottom:'6px' }}>
-              {/* REPLACE with supervisor's real name */}
-              [Supervisor Name]
+              M. MFONDOUM WILLIAM
             </h2>
             <p style={{ color:'rgba(255,255,255,0.4)', fontSize:'13px', marginBottom:'20px', lineHeight:1.6 }}>
-              Academic Supervisor<br />
-              ZTF University Institute (HIACOMST)<br />
+              Supervisor<br />
+              ZTF University Institute (ZTF-UI)<br />
               HND Software Engineering Programme
             </p>
             <p style={{ fontSize:'14px', color:'rgba(255,255,255,0.5)', lineHeight:1.75, marginBottom:'24px' }}>
@@ -137,7 +133,7 @@ export default function TeamPage() {
               and technical guidance throughout the development process.
             </p>
             <div style={{ display:'flex', gap:'8px', justifyContent:'center', flexWrap:'wrap' }}>
-              {['Project Management', 'Architecture', 'Methodology', 'HND'].map(t => (
+              {['Project Management', 'Architecture', 'Methodology'].map(t => (
                 <span key={t} style={{
                   background:'rgba(26,92,255,0.08)',
                   border:'1px solid rgba(26,92,255,0.2)',
@@ -149,19 +145,7 @@ export default function TeamPage() {
           </div>
         </div>
 
-        {/* Photo instructions */}
-        <div style={{
-          maxWidth:'900px', margin:'24px auto 0',
-          background:'rgba(245,197,24,0.06)',
-          border:'1px solid rgba(245,197,24,0.2)',
-          borderRadius:'12px', padding:'16px 20px',
-          display:'flex', gap:'12px', alignItems:'flex-start',
-        }}>
-          <span style={{ fontSize:'18px', flexShrink:0 }}>💡</span>
-          <p style={{ fontSize:'13px', color:'rgba(255,255,255,0.5)', lineHeight:1.65, margin:0 }}>
-            <strong style={{ color:'#f5c518' }}>To add real photos:</strong> Put your photo as <code style={{ background:'rgba(255,255,255,0.08)', padding:'1px 6px', borderRadius:'4px' }}>public/team/serge.jpg</code> and supervisor photo as <code style={{ background:'rgba(255,255,255,0.08)', padding:'1px 6px', borderRadius:'4px' }}>public/team/supervisor.jpg</code> — then replace the emoji with <code style={{ background:'rgba(255,255,255,0.08)', padding:'1px 6px', borderRadius:'4px' }}>&lt;img src="/team/serge.jpg" .../&gt;</code>
-          </p>
-        </div>
+
       </section>
 
       {/* Institution */}
@@ -171,7 +155,7 @@ export default function TeamPage() {
       }}>
         <div style={{ maxWidth:'900px', margin:'0 auto', display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:'14px' }}>
           {[
-            { icon:'🎓', title:'ZTF University Institute', sub:'HIACOMST · Yaoundé, Cameroon', desc:'Academic institution where Serge Cabrel studies HND Software Engineering.', color:'#18b87a' },
+            { icon:'🎓', title:'ZTF University Institute', sub:'ZTF-UI · Yaoundé, Cameroon', desc:'Academic institution where Serge Cabrel studies HND Software Engineering.', color:'#18b87a' },
             { icon:'💼', title:'QuamTech', sub:'Internship Host · Yaoundé', desc:'Technology company where GoDrive was designed and developed during the internship period.', color:'#1a5cff' },
             { icon:'📍', title:'GoDrive for Bertoua', sub:'East Region · Cameroon', desc:'The target community — Bertoua residents who benefit from digital transport booking for the first time.', color:'#e84118' },
           ].map((c,i) => (

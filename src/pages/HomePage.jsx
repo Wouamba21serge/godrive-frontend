@@ -205,7 +205,7 @@ export default function HomePage() {
           </h2>
           <p style={{ fontSize:'clamp(14px,1.6vw,16px)', color:'rgba(255,255,255,0.5)', lineHeight:1.85, marginBottom:'16px' }}>
             Before GoDrive, residents of Bertoua had no digital way to book a trusted vehicle.
-            All transport was informal — negotiated verbally, paid in cash, with no verification.
+            All transport was informal — negotiated verbally, paid in cash, with no verification, including difficulties in findind vehicles during peak hours.
           </p>
           <p style={{ fontSize:'clamp(14px,1.6vw,16px)', color:'rgba(255,255,255,0.5)', lineHeight:1.85, marginBottom:'28px' }}>
             GoDrive is the first platform built specifically for Bertoua — with Mobile Money payments,
@@ -226,7 +226,6 @@ export default function HomePage() {
             { icon:'📱', title:'PWA App', desc:'Works on any phone without app store' },
             { icon:'💸', title:'Mobile Money', desc:'MTN MoMo & Orange Money' },
             { icon:'🗺️', title:'Bertoua Map', desc:'Live vehicle location map' },
-            { icon:'🤖', title:'AI Engine', desc:'Smart vehicle recommendations' },
           ].map((c,i) => (
             <div key={i} style={{
               background:'rgba(255,255,255,0.03)',
@@ -296,10 +295,10 @@ export default function HomePage() {
           gap:'12px', maxWidth:'1000px', margin:'0 auto 36px',
         }}>
           {[
-            { img:'/vehicles/moto.jpg',    icon:'🏍️', name:'Moto Taxi',    price:'2,500',  color:'#e84118' },
-            { img:'/vehicles/corolla.jpg', icon:'🚗', name:'Sedan Taxi',   price:'8,000',  color:'#18b87a' },
-            { img:'/vehicles/hilux.jpg',   icon:'🚙', name:'4x4 SUV',      price:'15,000', color:'#7c3aed' },
-            { img:'/vehicles/hiace.jpg',   icon:'🚐', name:'Minibus',      price:'20,000', color:'#f5c518' },
+            { img:'/vehicles/Corolla.jpg', name:'Toyota Corolla 2024 - Reliable and fuel-efficient sedan.',    price:'2,500',  color:'#e84118' },
+            { img:'/vehicles/Honda.jpg', name:'Honda City 2024 - Compact and stylish with great fuel economy.',   price:'8,000',  color:'#18b87a' },
+            { img:'/vehicles/car8.jpg',  name:'Toyota Fortuner 2024 - Robust SUV for all terrains.',      price:'15,000', color:'#7c3aed' },
+            { img:'/vehicles/car9.jpg',  name:'Kia Sportage 2024 - Versatile and comfortable SUV',      price:'20,000', color:'#f5c518' },
           ].map((v,i) => (
             <div key={i} onClick={() => navigate('/vehicles')} style={{
               background:'rgba(255,255,255,0.03)',
@@ -474,8 +473,8 @@ export default function HomePage() {
             <h4 style={{ fontSize:'11px', fontWeight:'700', color:'rgba(255,255,255,0.4)', letterSpacing:'2px', textTransform:'uppercase', marginBottom:'18px' }}>Contact</h4>
             {[
               { icon:'📍', text:'Bertoua, East Region' },
-              { icon:'📞', text:'+237 6XX XXX XXX' },
-              { icon:'📧', text:'contact@godrive.cm' },
+              { icon:'📞', text:'+237 694 99 76 08' },
+              { icon:'📧', text:'wouambaserge21@gmail.com' },
               { icon:'⏰', text:'Available 24/7' },
             ].map((c,i) => (
               <div key={i} style={{ display:'flex', gap:'8px', alignItems:'center', color:'rgba(255,255,255,0.35)', fontSize:'13px', marginBottom:'10px' }}>
