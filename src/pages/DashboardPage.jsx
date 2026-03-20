@@ -210,7 +210,7 @@ function AdminDashboard({ users, loading, isMobile, activeTab, setActiveTab, nav
                 <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</div>
                 {!s.real && (
                   <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', marginTop: '4px', fontStyle: 'italic' }}>
-                    Available Week A
+                    💪 Bertoua is moving forward — and so are we!
                   </div>
                 )}
               </div>
@@ -256,7 +256,7 @@ function AdminDashboard({ users, loading, isMobile, activeTab, setActiveTab, nav
             <span style={{ fontSize: '20px', flexShrink: 0 }}>🔧</span>
             <div>
               <p style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: 1.65 }}>
-                <strong style={{ color: '#1a5cff' }}>Vehicle & Booking modules coming in Week A.</strong> Once built, this dashboard will show live vehicle listings, active bookings, payment records, and real-time revenue analytics.
+                <strong style={{ color: '#1a5cff' }}>Vehicle & Booking modules.</strong> This dashboard shows live vehicle listings, active bookings, payment records, and real-time revenue analytics.
               </p>
             </div>
           </div>
@@ -339,7 +339,7 @@ function AdminDashboard({ users, loading, isMobile, activeTab, setActiveTab, nav
       {activeTab === 'vehicles' && (
         <ComingSoonTab
           icon="🚗" title="Vehicle Management"
-          desc="Vehicle CRUD — add, edit, delete vehicles. Cloudinary image upload. Built in Week A Day 1–2."
+          desc="Vehicle CRUD — add, edit, delete vehicles. Cloudinary image upload."
           color="#18b87a"
         />
       )}
@@ -348,7 +348,7 @@ function AdminDashboard({ users, loading, isMobile, activeTab, setActiveTab, nav
       {activeTab === 'bookings' && (
         <ComingSoonTab
           icon="📅" title="Booking Management"
-          desc="All reservations with status tracking — PENDING, CONFIRMED, COMPLETED, CANCELLED. Built in Week A Day 5."
+          desc="All reservations with status tracking — PENDING, CONFIRMED, COMPLETED, CANCELLED."
           color="#7c3aed"
         />
       )}
@@ -403,7 +403,7 @@ function CustomerDashboard({ isMobile, navigate }) {
 
       <ComingSoonTab
         icon="📅" title="Booking History"
-        desc="Your booking history, payment receipts, and vehicle ratings will appear here. Built in Week A Day 5."
+        desc="Your booking history, payment receipts, and vehicle ratings will appear here."
         color="#1a5cff"
       />
     </div>
@@ -441,7 +441,7 @@ function DriverDashboard({ isMobile }) {
 
       <ComingSoonTab
         icon="🧑‍✈️" title="My Assigned Trips"
-        desc="Bookings assigned to you by admin, customer pickup details, trip status updates. Built in Week A Day 5."
+        desc="Bookings assigned to you by admin, customer pickup details, trip status updates."
         color="#7c3aed"
       />
     </div>
@@ -517,7 +517,7 @@ function ComingSoonTab({ icon, title, desc, color }) {
         padding: '6px 18px', borderRadius: '50px',
         fontSize: '11px', fontWeight: '700', letterSpacing: '1px',
         textTransform: 'uppercase',
-      }}>🚀 Great things are coming — stay tuned!</div>
+      }}>🚀Bertoua is moving forward — 💪 so are we!!</div>
     </div>
   )
 }
