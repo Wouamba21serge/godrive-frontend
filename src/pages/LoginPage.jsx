@@ -1,193 +1,108 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { loginUser } from '../services/api'
-import { useAuth } from '../context/AuthContext'
-import { useResponsive } from '../hooks/useResponsive'
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { login } from '../services/api';
+import Footer from '../components/Footer';
 
 export default function LoginPage() {
-  const [form, setForm] = useState({ email: '', password: '' })
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [showPass, setShowPass] = useState(false)
-  const { login } = useAuth()
-  const navigate = useNavigate()
-  const { isMobile } = useResponsive()
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
-    if (!form.email || !form.password) {
-      setError('Please fill in all fields.')
-      return
-    }
-    setLoading(true); setError('')
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
     try {
-      const res = await loginUser(form)
-      login(res.data, res.data.token)
-      navigate('/dashboard')
-    } catch (e) {
-      setError(e.response?.data || 'Login failed. Check your credentials.')
-    } finally { setLoading(false) }
-  }
-
-  const inputStyle = {
-    width: '100%',
-    background: 'rgba(255,255,255,0.06)',
-    border: '1.5px solid rgba(255,255,255,0.1)',
-    borderRadius: '12px',
-    padding: isMobile ? '14px 16px' : '13px 16px',
-    color: '#fff',
-    fontSize: isMobile ? '16px' : '14px', // 16px prevents zoom on iOS
-    outline: 'none',
-    boxSizing: 'border-box',
-    transition: 'border-color 0.2s',
-  }
+      const response = await login(formData);
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data));
+      if (response.data.role === 'ADMIN') {
+        navigate('/dashboard');
+      } else {
+        navigate('/vehicles');
+      }
+    } catch (err) {
+      setError('Invalid email or password. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#0c0f18',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: isMobile ? '16px' : '20px',
-      fontFamily: "'DM Sans', system-ui, sans-serif",
-    }}>
-      {/* Background glow */}
-      <div style={{
-        position: 'fixed', top: '20%', left: '50%',
-        transform: 'translateX(-50%)',
-        width: isMobile ? '300px' : '500px',
-        height: isMobile ? '300px' : '500px',
-        background: 'radial-gradient(circle, rgba(232,65,24,0.08) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
+    <>
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+        <div className="bg-gray-900 p-8 rounded-2xl shadow-xl w-full max-w-md">
 
-      <div style={{
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: isMobile ? '20px' : '24px',
-        padding: isMobile ? '32px 24px' : '48px 44px',
-        width: '100%',
-        maxWidth: '420px',
-        position: 'relative',
-      }}>
-
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: isMobile ? '28px' : '36px' }}>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: '8px',
-            marginBottom: '8px'
-          }}>
-            <div style={{
-              width: '36px', height: '36px', background: '#e84118',
-              borderRadius: '10px', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', fontSize: '18px'
-            }}>🚗</div>
-            <h1 style={{
-              fontSize: isMobile ? '28px' : '32px',
-              fontWeight: '900', color: '#fff',
-              letterSpacing: '-1px', margin: 0
-            }}>
-              Go<span style={{ color: '#e84118' }}>Drive</span>
+          {/* Logo */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-white">
+              Go<span className="text-orange-500">Drive</span>
             </h1>
+            <p className="text-gray-400 mt-2">Sign in to your account</p>
           </div>
-          <p style={{
-            color: 'rgba(255,255,255,0.35)',
-            fontSize: isMobile ? '13px' : '14px',
-            margin: 0
-          }}>Welcome back to GoDrive</p>
-        </div>
 
-        {/* Error */}
-        {error && (
-          <div style={{
-            background: 'rgba(232,65,24,0.1)',
-            border: '1px solid rgba(232,65,24,0.3)',
-            borderRadius: '10px', padding: '12px 14px',
-            color: '#f08060', fontSize: '13px',
-            marginBottom: '20px', lineHeight: '1.5'
-          }}>{error}</div>
-        )}
+          {/* Error */}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500 text-red-400
+              rounded-lg p-3 mb-4 text-sm">
+              {error}
+            </div>
+          )}
 
-        {/* Email */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{
-            color: 'rgba(255,255,255,0.5)', fontSize: '12px',
-            display: 'block', marginBottom: '8px',
-            letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: '600'
-          }}>Email</label>
-          <input
-            type="email"
-            value={form.email}
-            onChange={e => setForm({...form, email: e.target.value})}
-            placeholder="you@example.com"
-            style={inputStyle}
-            autoComplete="email"
-          />
-        </div>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="text-gray-400 text-sm mb-1 block">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                placeholder="you@example.com"
+                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3
+                  border border-gray-700 focus:outline-none focus:border-orange-500"
+              />
+            </div>
 
-        {/* Password */}
-        <div style={{ marginBottom: '28px' }}>
-          <label style={{
-            color: 'rgba(255,255,255,0.5)', fontSize: '12px',
-            display: 'block', marginBottom: '8px',
-            letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: '600'
-          }}>Password</label>
-          <div style={{ position: 'relative' }}>
-            <input
-              type={showPass ? 'text' : 'password'}
-              value={form.password}
-              onChange={e => setForm({...form, password: e.target.value})}
-              onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-              placeholder="••••••••"
-              style={{ ...inputStyle, paddingRight: '48px' }}
-              autoComplete="current-password"
-            />
+            <div>
+              <label className="text-gray-400 text-sm mb-1 block">Password</label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="••••••••"
+                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3
+                  border border-gray-700 focus:outline-none focus:border-orange-500"
+              />
+            </div>
+
             <button
-              onClick={() => setShowPass(!showPass)}
-              style={{
-                position: 'absolute', right: '14px', top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'none', border: 'none',
-                color: 'rgba(255,255,255,0.3)', cursor: 'pointer',
-                fontSize: '16px', padding: '4px',
-                minWidth: '32px', minHeight: '32px',
-              }}
-            >{showPass ? '🙈' : '👁️'}</button>
-          </div>
+              type="submit"
+              disabled={loading}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white
+                font-semibold py-3 rounded-lg transition duration-200">
+              {loading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+
+          {/* Register Link */}
+          <p className="text-center text-gray-400 mt-6 text-sm">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-orange-500 hover:underline">
+              Register here
+            </Link>
+          </p>
         </div>
-
-        {/* Button */}
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          style={{
-            width: '100%',
-            background: loading ? '#a83010' : '#e84118',
-            color: '#fff', border: 'none',
-            borderRadius: '12px',
-            padding: isMobile ? '16px' : '14px',
-            fontWeight: '800',
-            fontSize: isMobile ? '16px' : '15px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            transition: 'all 0.2s',
-            letterSpacing: '0.3px',
-            minHeight: '52px', // Good touch target on mobile
-          }}
-        >
-          {loading ? '⏳ Signing in...' : 'Sign In →'}
-        </button>
-
-        <p style={{
-          textAlign: 'center', marginTop: '20px',
-          color: 'rgba(255,255,255,0.25)',
-          fontSize: isMobile ? '14px' : '13px'
-        }}>
-          No account?{' '}
-          <Link to="/register" style={{
-            color: '#e84118', textDecoration: 'none', fontWeight: '600'
-          }}>Register here</Link>
-        </p>
       </div>
-    </div>
-  )
+      <Footer />
+    </>
+  );
 }
